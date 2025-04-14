@@ -1,290 +1,150 @@
-# Home Server Setup Guide with Colima and Docker
-
-## Table of Contents
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Container Strategy](#container-strategy)
-- [Security and Permissions](#security-and-permissions)
-- [Service Configuration](#service-configuration)
-- [Deployment](#deployment)
-- [Maintenance](#maintenance)
-
-## Prerequisites
-
-Before starting, ensure you have:
-- macOS operating system
-- Homebrew package manager installed
-- At least 8GB RAM (16GB recommended)
-- At least 256GB storage
-- Stable internet connection
-
-## Installation
-
-### 1. Install Required Tools
-
-```bash
-# Install Colima
-brew install colima
-
-# Install Docker and Docker Compose
-brew install docker docker-compose
-```
-
-### 2. Configure Colima
-
-```bash
-# Start Colima with custom resources (adjust based on your machine)
-colima start --cpu 4 --memory 8 --disk 100
-
-# Verify Docker installation
-docker ps
-```
-
-## Container Strategy
-
-### Multiple Containers vs Single Container
-
-We'll use multiple containers for several reasons:
-1. **Isolation**: Each service runs in its own environment
-2. **Security**: If one service is compromised, others remain safe
-3. **Resource Management**: Better control over resource allocation
-4. **Scalability**: Easier to scale individual services
-5. **Maintenance**: Can update/restart services independently
-
-### Container Structure
-
-```plaintext
-my-homeserver/
-├── docker-compose.yml
-├── nginx/
-│   ├── Dockerfile
-│   └── conf/
-├── website/
-│   └── public/
-├── game-server/
-│   ├── Dockerfile
-│   └── cube3d/
-└── database/
-    └── data/
-```
-
-### Example docker-compose.yml
-
-```yaml
-version: '3.8'
-
-services:
-  nginx:
-    build: ./nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./website:/usr/share/nginx/html
-    networks:
-      - frontend
-    restart: unless-stopped
-
-  game-server:
-    build: ./game-server
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./game-server/cube3d:/app
-    networks:
-      - frontend
-      - backend
-    depends_on:
-      - database
-    restart: unless-stopped
-
-  database:
-    image: postgres:14
-    environment:
-      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
-    volumes:
-      - ./database/data:/var/lib/postgresql/data
-    networks:
-      - backend
-    restart: unless-stopped
+# HomeDrive: Personal Cloud Storage Server
 
-networks:
-  frontend:
-  backend:
-
-secrets:
-  db_password:
-    file: ./secrets/db_password.txt
-```
-
-## Security and Permissions
-
-### Container Users
-
-Each service should run as a non-root user:
+A self-hosted cloud storage solution running on a Raspberry Pi 5, providing file sharing, user management, and web access to your personal data.
 
-```dockerfile
-# Example Dockerfile for game-server
-FROM node:16-alpine
+## Project Goals
 
-# Create app directory and user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-WORKDIR /app
+- Create a fully-functional alternative to commercial cloud storage services
+- Learn Docker containerization and microservices architecture
+- Practice Linux server administration and networking
+- Implement a secure and reliable backup solution
+- Develop a web interface for easy file management
 
-# Copy application files
-COPY --chown=appuser:appgroup . .
-
-# Switch to non-root user
-USER appuser
-
-CMD ["node", "server.js"]
-```
-
-### File Permissions
+## System Architecture
 
-```bash
-# Set proper permissions for mounted volumes
-chmod -R 755 website/
-chmod -R 750 database/data/
-```
-
-### Network Security
+This project uses Docker to create a modular, maintainable system with the following components:
 
-- Use separate networks for frontend and backend services
-- Expose only necessary ports
-- Use SSL/TLS for all external connections
+1. **File Server**: For network file sharing and storage
+2. **Database Server**: To manage users, permissions and file metadata
+3. **Web Server**: To host the web interface
+4. **Web Application**: The interface users will interact with
+5. **VPN Server**: For secure remote access (future addition)
 
-## Service Configuration
+## Development Roadmap
 
-### Website Configuration
+### Phase 1: Basic Infrastructure
+- [ ] Set up Docker and Docker Compose
+- [ ] Implement Samba file server
+- [ ] Set up Portainer for Docker management
+- [ ] Create data volume structure
+- [ ] Test basic file sharing
 
-1. Create Nginx configuration:
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    
-    location / {
-        root /usr/share/nginx/html;
-        index index.html;
-    }
-
-    location /game {
-        proxy_pass http://game-server:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-    }
-}
-```
-
-### Game Server Configuration
-
-1. Set up the game server environment:
-```javascript
-// server.js example
-const express = require('express');
-const app = express();
-
-app.use(express.static('public'));
-app.listen(3000);
-```
-
-## Deployment
-
-### Initial Deployment
-
-```bash
-# Build and start all services
-docker-compose up -d
-
-# Check service status
-docker-compose ps
-
-# View logs
-docker-compose logs -f
-```
-
-### Backup Strategy
-
-1. Create a backup script:
-```bash
-#!/bin/bash
-# backup.sh
-DATE=$(date +%Y%m%d)
-docker-compose down
-tar -czf backup-$DATE.tar.gz database/data website/public
-docker-compose up -d
-```
-
-## Maintenance
-
-### Regular Tasks
-
-1. Update containers:
-```bash
-# Pull latest images
-docker-compose pull
-
-# Rebuild and restart services
-docker-compose up -d --build
-```
-
-2. Monitor resources:
-```bash
-# Check container resource usage
-docker stats
-
-# View container logs
-docker-compose logs -f [service-name]
-```
-
-### Troubleshooting
-
-Common issues and solutions:
-
-1. Container won't start:
-   - Check logs: `docker-compose logs [service-name]`
-   - Verify configuration files
-   - Check resource availability
-
-2. Performance issues:
-   - Monitor resource usage
-   - Check application logs
-   - Adjust Colima resource allocation
-
-## Best Practices
-
-1. **Version Control**
-   - Keep all configuration files in Git
-   - Document changes and updates
-   - Use environment variables for sensitive data
-
-2. **Security**
-   - Regular security updates
-   - Use secrets management
-   - Implement proper firewall rules
-   - Regular security audits
-
-3. **Monitoring**
-   - Set up logging
-   - Monitor resource usage
-   - Track application metrics
-
-## Next Steps
-
-After basic setup:
-1. Implement SSL/TLS certificates
-2. Set up monitoring and alerting
-3. Configure automatic backups
-4. Implement CI/CD pipeline
-5. Add additional services as needed
-
-Remember to regularly:
-- Update containers and base images
-- Check logs for issues
-- Verify backups
-- Monitor resource usage
-- Test security measures
-
-This guide provides a foundation for your home server. Adjust configurations and resources based on your specific needs and hardware capabilities.
+### Phase 2: Database Integration
+- [ ] Add DB/SQL container
+- [ ] Create database schema for users and files
+- [ ] Implement backup routine for database
+- [ ] Test database connectivity
+
+### Phase 3: Web Interface
+- [ ] Set up Nginx web server
+- [ ] Develop basic web application (file listing, upload/download)
+- [ ] Implement user authentication
+- [ ] Connect web app to database and file system
+
+### Phase 4: Advanced Features
+- [ ] Add file sharing capabilities
+- [ ] Implement file versioning
+- [ ] Create mobile-friendly responsive design
+- [ ] Add file preview for common file types
+
+### Phase 5: Security & Remote Access
+- [ ] Set up VPN server for remote access
+- [ ] Implement SSL/TLS for web interface
+- [ ] Add two-factor authentication
+- [ ] Perform security audit
+
+## Getting Started
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Git
+- Basic Linux knowledge
+- VM for initial development (transitioning to Raspberry Pi 5 later)
+
+### Initial Setup
+
+1. Clone the repository:
+   ```bash
+   git clone <your-repo-url>
+   cd home-drive
+   ```
+
+2. Create necessary directories:
+   ```bash
+   mkdir -p volumes/shared volumes/backups volumes/database volumes/portainer
+   ```
+
+3. Start the base system:
+   ```bash
+   docker-compose up -d
+   ```
+
+4. Access Portainer for system management:
+   ```
+   http://your-server-ip:9000
+   ```
+
+## Container Setup
+
+### File Server (SSH/SFTP)
+
+- to do
+
+### Database (to do)
+
+### Web Server (to do)
+
+## Database Schema
+- to do
+
+## Web Application
+
+The web application will be built using:
+- Backend: to do
+- Frontend: to do
+- Authentication: to do
+
+### Key Features to Implement:
+1. User registration and login
+2. File browser with drag-and-drop upload
+3. File sharing (public/private links)
+4. Storage usage statistics
+5. User profile management
+
+## Migration to Raspberry Pi
+
+Once development and testing are complete in the VM environment:
+
+1. Install a Linux distribution on Raspberry Pi 5 (Ubuntu Server recommended)
+2. Install Docker and Docker Compose:
+3. Clone the repository to the Raspberry Pi
+4. Copy data volumes from VM to Pi
+5. Run docker-compose up -d on the Pi
+
+## Troubleshooting
+
+### Common Issues:
+
+1. **Samba connection issues**:
+   - Check firewall settings
+   - Verify credentials
+
+2. **Docker container not starting**:
+   - Check logs: `docker-compose logs <service-name>`
+   - Verify port conflicts: `netstat -tuln`
+   - Check disk space: `df -h`
+
+3. **Web application not accessible**:
+   - Check Nginx configuration
+   - Verify application logs
+   - Test direct connection to application container
+
+## Resources
+
+- [Docker Documentation](https://docs.docker.com/)
+- [Nginx Documentation](https://nginx.org/en/docs/)
+- [Raspberry Pi Documentation](https://www.raspberrypi.org/documentation/)
+
+## License
+
