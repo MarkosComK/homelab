@@ -1,150 +1,46 @@
-# HomeDrive: Personal Cloud Storage Server
+# HomeLab - Personal File Sharing Environment
 
-A self-hosted cloud storage solution running on a Raspberry Pi 5, providing file sharing, user management, and web access to your personal data.
+## Project Overview
 
-## Project Goals
+This project aims to establish a home environment for storing and sharing files among household members. The initial implementation uses *Nginx* as a web server hosting a simple HTML page. Future development will enable Ubuntu users to log in to the web interface using their system credentials.
 
-- Create a fully-functional alternative to commercial cloud storage services
-- Learn Docker containerization and microservices architecture
-- Practice Linux server administration and networking
-- Implement a secure and reliable backup solution
-- Develop a web interface for easy file management
+This means household members will have Ubuntu accounts with appropriate permissions and can use these same credentials to access applications through the browser via Nginx. The purpose is to create a personal "home" environment while gaining a deeper understanding of underlying technologies, rather than relying on pre-made solutions.
 
-## System Architecture
+Feel free to share your thoughts on this project by contacting me through any available channel. Enjoy!
 
-This project uses Docker to create a modular, maintainable system with the following components:
+**Note:** Basic Linux knowledge is recommended to understand concepts discussed here. If you have questions or concerns, please reach out - I'm happy to help!
 
-1. **File Server**: For network file sharing and storage
-2. **Database Server**: To manage users, permissions and file metadata
-3. **Web Server**: To host the web interface
-4. **Web Application**: The interface users will interact with
-5. **VPN Server**: For secure remote access (future addition)
+## System Specifications
 
-## Development Roadmap
+This HomeLab runs on a Raspberry Pi 5 with 8GB RAM - a powerful and elegant machine. While the ARM architecture may present initial challenges, it offers excellent learning opportunities. The system uses a 500GB SSD for storage in the initial setup. (Images will be added in future updates).
 
-### Phase 1: Basic Infrastructure
-- [ ] Set up Docker and Docker Compose
-- [ ] Implement Samba file server
-- [ ] Set up Portainer for Docker management
-- [ ] Create data volume structure
-- [ ] Test basic file sharing
+## Linux Filesystem Hierarchy Standard (FHS)
 
-### Phase 2: Database Integration
-- [ ] Add DB/SQL container
-- [ ] Create database schema for users and files
-- [ ] Implement backup routine for database
-- [ ] Test database connectivity
+Organization is crucial for this project. During my time at 42 School, I learned the importance of structured organization and *why* certain organizational patterns exist. Following industry standards, we'll use the Linux `/opt` directory to store and access our projects.
 
-### Phase 3: Web Interface
-- [ ] Set up Nginx web server
-- [ ] Develop basic web application (file listing, upload/download)
-- [ ] Implement user authentication
-- [ ] Connect web app to database and file system
+Why this location? For reference, see page 13 of the [Linux Foundation's FHS 3.0 specification](https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.pdf). The Linux root directory (`/`) contains several standard directories (each worthy of further study), including our target location `/opt`:
 
-### Phase 4: Advanced Features
-- [ ] Add file sharing capabilities
-- [ ] Implement file versioning
-- [ ] Create mobile-friendly responsive design
-- [ ] Add file preview for common file types
+```shell
+markos@ubuntu:/$ ls
+bin   dev  home  lost+found  mnt  proc  run   snap  sys  usr
+boot  etc  lib   media       opt  root  sbin  srv   tmp  var
+```
 
-### Phase 5: Security & Remote Access
-- [ ] Set up VPN server for remote access
-- [ ] Implement SSL/TLS for web interface
-- [ ] Add two-factor authentication
-- [ ] Perform security audit
+The `/opt` directory will serve as our project hub. Further details about the folder structure for each tool will be available in this README or in dedicated folders within this repository (to be added later).
 
-## Getting Started
+## NGINX Configuration
 
-### Prerequisites
+The current setup is in its early stages. The immediate goal is to deploy Nginx using Docker containers, running as PID 1. Once the HTML page is accessible within the HomeLab network, this section will be updated with further details.
 
-- Docker and Docker Compose
-- Git
-- Basic Linux knowledge
-- VM for initial development (transitioning to Raspberry Pi 5 later)
+## Current Status
 
-### Initial Setup
+- Setting up Nginx with Docker
+- Preparing initial web interface
+- Planning user authentication integration
 
-1. Clone the repository:
-   ```bash
-   git clone <your-repo-url>
-   cd home-drive
-   ```
+## Next Steps
 
-2. Create necessary directories:
-   ```bash
-   mkdir -p volumes/shared volumes/backups volumes/database volumes/portainer
-   ```
-
-3. Start the base system:
-   ```bash
-   docker-compose up -d
-   ```
-
-4. Access Portainer for system management:
-   ```
-   http://your-server-ip:9000
-   ```
-
-## Container Setup
-
-### File Server (SSH/SFTP)
-
-- to do
-
-### Database (to do)
-
-### Web Server (to do)
-
-## Database Schema
-- to do
-
-## Web Application
-
-The web application will be built using:
-- Backend: to do
-- Frontend: to do
-- Authentication: to do
-
-### Key Features to Implement:
-1. User registration and login
-2. File browser with drag-and-drop upload
-3. File sharing (public/private links)
-4. Storage usage statistics
-5. User profile management
-
-## Migration to Raspberry Pi
-
-Once development and testing are complete in the VM environment:
-
-1. Install a Linux distribution on Raspberry Pi 5 (Ubuntu Server recommended)
-2. Install Docker and Docker Compose:
-3. Clone the repository to the Raspberry Pi
-4. Copy data volumes from VM to Pi
-5. Run docker-compose up -d on the Pi
-
-## Troubleshooting
-
-### Common Issues:
-
-1. **Samba connection issues**:
-   - Check firewall settings
-   - Verify credentials
-
-2. **Docker container not starting**:
-   - Check logs: `docker-compose logs <service-name>`
-   - Verify port conflicts: `netstat -tuln`
-   - Check disk space: `df -h`
-
-3. **Web application not accessible**:
-   - Check Nginx configuration
-   - Verify application logs
-   - Test direct connection to application container
-
-## Resources
-
-- [Docker Documentation](https://docs.docker.com/)
-- [Nginx Documentation](https://nginx.org/en/docs/)
-- [Raspberry Pi Documentation](https://www.raspberrypi.org/documentation/)
-
-## License
-
+- Establish secure user authentication
+- Implement file sharing capabilities
+- Set up proper access controls
+- Develop a user-friendly interface
