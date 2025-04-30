@@ -34,6 +34,24 @@ The `/opt` directory will serve as our project hub. Further details about the fo
 
 The current setup is in its early stages. The immediate goal is to deploy Nginx using Docker containers, running as PID 1. Once the HTML page is accessible within the HomeLab network, this section will be updated with further details.
 
+### Structure
+
+```
+/opt/production/
+├── nginx/                    # Nginx web server
+│   ├── conf/                 # Configuration files
+│   │   ├── nginx.conf        # Main configuration
+│   │   └── sites-enabled/    # Virtual host configurations
+│   │       └── default.conf  # Default site configuration
+│   ├── html/                 # Web content
+│   │   ├── index.html        # Homepage
+│   │   ├── css/              # Stylesheets
+│   │   └── js/               # JavaScript files
+│   └── logs/                 # Log files
+│
+└── docker-compose.yml        # Docker Compose configuration
+```
+
 ## Current Status
 
 - Setting up Nginx with Docker
