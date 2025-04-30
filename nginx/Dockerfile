@@ -11,13 +11,13 @@ RUN apk add --no-cache \
 RUN mkdir -p /run/nginx
 
 # Copy custom nginx configuration
-#COPY config/nginx.conf /etc/nginx/nginx.conf
+COPY config/nginx.conf /etc/nginx/nginx.conf
 
 # Create web root directory
-RUN mkdir -p /usr/share/nginx/html
+RUN mkdir -p /www/src/html
 
 # Copy website files
-COPY html/ /usr/share/nginx/html/
+COPY html/ /www/src/html/
 
 # Expose port 80
 EXPOSE 80

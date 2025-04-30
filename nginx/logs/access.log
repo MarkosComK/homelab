@@ -1,0 +1,2 @@
+192.168.1.236 - - [30/Apr/2025:15:02:36 +0000] "GET / HTTP/1.1" 200 1778 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"
+192.168.1.236 - - [30/Apr/2025:15:02:36 +0000] "GET /favicon.ico HTTP/1.1" 404 555 "http://192.168.1.239/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36"
