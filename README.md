@@ -14,6 +14,8 @@ Feel free to share your thoughts on this project by contacting me through any av
 
 This HomeLab runs on a Raspberry Pi 5 with 8GB RAM - a powerful and elegant machine. While the ARM architecture may present initial challenges, it offers excellent learning opportunities. The system uses a 500GB SSD for storage in the initial setup. (Images will be added in future updates).
 
+<p align="center"> <img src="https://github.com/user-attachments/assets/ddc80e66-8591-472d-b69c-c6647a329137" alt="Raspberry Pi 5"> </p>
+
 ## Linux Filesystem Hierarchy Standard (FHS)
 
 Organization is crucial for this project. During my time at 42 School, I learned the importance of structured organization and *why* certain organizational patterns exist. Following industry standards, we'll use the Linux `/opt` directory to store and access our projects.
