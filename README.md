@@ -39,6 +39,7 @@ The current setup is in its early stages. The immediate goal is to deploy Nginx 
 ```
 /opt/production/
 ├── nginx/                    # Nginx web server
+│   ├── Dockerfile            # NGINX container configuration
 │   ├── conf/                 # Configuration files
 │   │   ├── nginx.conf        # Main configuration
 │   │   └── sites-enabled/    # Virtual host configurations
